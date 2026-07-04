@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step-by-Step Number System Converter</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f0f4f8;
+    padding:20px;
+}
+
+.container{
+    max-width:750px;
+    margin:auto;
+    background:#fff;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,.2);
+}
+
+h2{
+    text-align:center;
+    color:#0066cc;
+    margin-bottom:20px;
+}
+
+input,select,button{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    font-size:16px;
+    border-radius:5px;
+}
+
+button{
+    background:#0066cc;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#004999;
+}
+
+.result{
+    margin-top:20px;
+}
+
+.result p{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#eef7ff;
+    padding:12px;
+    border-radius:8px;
+    margin:10px 0;
+}
+
+.copy-btn{
+    width:auto;
+    padding:7px 15px;
+    background:#28a745;
+    border:none;
+    color:white;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.copy-btn:hover{
+    background:#218838;
+}
+
+pre{
+    margin-top:15px;
+    background:#222;
+    color:#00ff99;
+    padding:15px;
+    border-radius:8px;
+    overflow:auto;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h2>📘 Step-by-Step Number System Converter</h2>
+<select id="base">
+<option value="2">Binary</option>
+<option value="8">Octal</option>
+<option value="10" selected>Decimal</option>
+<option value="16">Hexadecimal</option>
+</select>
+<input type="text" id="number" placeholder="Enter Number">
+
+
+
+<button onclick="convert()">Convert</button>
+
+<div class="result">
+
+<h3>Conversion Result</h3>
+
+<p>
+<b>Decimal:</b>
+<span id="dec">-</span>
+<button class="copy-btn" onclick="copyText('dec',this)">📋 Copy</button>
+</p>
+
+<p>
+<b>Binary:</b>
+<span id="bin">-</span>
+<button class="copy-btn" onclick="copyText('bin',this)">📋 Copy</button>
+</p>
+
+<p>
+<b>Octal:</b>
+<span id="oct">-</span>
+<button class="copy-btn" onclick="copyText('oct',this)">📋 Copy</button>
+</p>
+
+<p>
+<b>Hexadecimal:</b>
+<span id="hex">-</span>
+<button class="copy-btn" onclick="copyText('hex',this)">📋 Copy</button>
+</p>
+
+<h3 style="margin-top:20px;">Step-by-Step Solution</h3>
+
+<pre id="steps">Your solution will appear here...</pre>
+
+</div>
+
+</div>
+
+<script>
+
+function digitValue(ch){
+
+    if(ch>='0' && ch<='9')
+        return ch.charCodeAt(0)-48;
+
+    return ch.toUpperCase().charCodeAt(0)-55;
+
+}
+
+function convert(){
+
+let value=document.getElementById("number").value.trim().toUpperCase();
+
+let base=parseInt(document.getElementById("base").value);
+
+if(value==""){
+
+alert("Please enter a number.");
+
+return;
+
+}
+
+let decimal=parseInt(value,base);
+
+if(isNaN(decimal)){
+
+alert("Invalid Number for selected number system.");
+
+return;
+
+}
+
+document.getElementById("dec").innerHTML=decimal;
+
+document.getElementById("bin").innerHTML=decimal.toString(2);
+
+document.getElementById("oct").innerHTML=decimal.toString(8);
+
+document.getElementById("hex").innerHTML=decimal.toString(16).toUpperCase();
+
+let step="";
+
+if(base!=10){
+
+step+="STEP 1: Convert to Decimal\n\n";
+
+let len=value.length;
+
+let total=0;
+
+for(let i=0;i<len;i++){
+
+let digit=digitValue(value[i]);
+
+let power=len-1-i;
+
+let calc=digit*Math.pow(base,power);
+
+step+=digit+" × "+base+"^"+power+" = "+calc+"\n";
+
+total+=calc;
+
+}
+
+step+="\nDecimal = "+total+"\n\n";
+
+}else{
+
+step+="Input is already in Decimal.\n\n";
+
+}
+
+step+="STEP 2: Convert Decimal to Other Number Systems\n\n";
+
+step+="Binary      = "+decimal.toString(2)+"\n";
+
+step+="Octal       = "+decimal.toString(8)+"\n";
+
+step+="Hexadecimal = "+decimal.toString(16).toUpperCase()+"\n";
+
+document.getElementById("steps").textContent=step;
+
+}
+
+function copyText(id,button){
+
+const text=document.getElementById(id).textContent;
+
+navigator.clipboard.writeText(text);
+
+const old=button.innerHTML;
+
+button.innerHTML="✅ Copied!";
+
+setTimeout(function(){
+
+button.innerHTML=old;
+
+},1500);
+
+}
+
+function isBinary(value){
+    return /^[01]+$/.test(value);
+}
+
+function padBinary(a,b){
+    const length=Math.max(a.length,b.length);
+    return [a.padStart(length,'0'), b.padStart(length,'0')];
+}
+
+function addBinary(a,b){
+    let carry=0;
+    let result='';
+    for(let i=a.length-1;i>=0;i--){
+        const sum=Number(a[i])+Number(b[i])+carry;
+        result=(sum%2)+result;
+        carry=Math.floor(sum/2);
+    }
+    return carry?carry+result:result;
+}
+
+function invertBinary(value){
+    return value.split('').map(ch=> ch==='0'?'1':'0').join('');
+}
+
+function twosComplement(value){
+    const ones=invertBinary(value);
+    return addBinary(ones, '1'.padStart(value.length,'0')).slice(-value.length);
+}
+
+function displayBinaryResult(message, steps){
+    document.getElementById('answer').innerHTML='<p style="padding:12px;background:#eef7ff;border-radius:8px;">'+message+'</p>';
+    document.getElementById('binarySteps').textContent=steps;
+}
+
+function onesAddition(){
+    const num1=document.getElementById('num1').value.trim();
+    const num2=document.getElementById('num2').value.trim();
+    if(!isBinary(num1) || !isBinary(num2) || num1==='' || num2===''){
+        displayBinaryResult('Please enter two valid binary numbers.', '');
+        return;
+    }
+    let [a,b]=padBinary(num1,num2);
+    let sum=addBinary(a,b);
+    let steps='Step 1: Align operands\n'+a+' + '+b+'\n\n';
+    steps+='Step 2: Add bit by bit\nResult = '+sum+'\n\n';
+    if(sum.length>a.length){
+        const carry=sum[0];
+        const lower=sum.slice(1);
+        steps+='Step 3: End-around carry found: '+carry+'\n';
+        const wrapped=addBinary(lower, carry.padStart(a.length,'0')).slice(-a.length);
+        steps+='Step 4: Add carry to lower bits\n'+lower+' + '+carry.padStart(a.length,'0')+' = '+wrapped+'\n\n';
+        sum=wrapped;
+    } else {
+        steps+='Step 3: No end-around carry\n\n';
+    }
+    displayBinaryResult('1\'s Complement Addition Result: <strong>'+sum+'</strong>', steps);
+}
+
+function twosAddition(){
+    const num1=document.getElementById('num1').value.trim();
+    const num2=document.getElementById('num2').value.trim();
+    if(!isBinary(num1) || !isBinary(num2) || num1==='' || num2===''){
+        displayBinaryResult('Please enter two valid binary numbers.', '');
+        return;
+    }
+    let [a,b]=padBinary(num1,num2);
+    let sum=addBinary(a,b);
+    let steps='Step 1: Align operands\n'+a+' + '+b+'\n\n';
+    steps+='Step 2: Add bit by bit\nRaw result = '+sum+'\n\n';
+    if(sum.length>a.length){
+        steps+='Step 3: Overflow carry dropped\n';
+        sum=sum.slice(1);
+    } else {
+        steps+='Step 3: No overflow carry\n';
+    }
+    displayBinaryResult('2\'s Complement Addition Result: <strong>'+sum+'</strong>', steps);
+}
+
+function onesSubtraction(){
+    const num1=document.getElementById('num1').value.trim();
+    const num2=document.getElementById('num2').value.trim();
+    if(!isBinary(num1) || !isBinary(num2) || num1==='' || num2===''){
+        displayBinaryResult('Please enter two valid binary numbers.', '');
+        return;
+    }
+    let [a,b]=padBinary(num1,num2);
+    const bOnes=invertBinary(b);
+    let sum=addBinary(a,bOnes);
+    let steps='Step 1: Align operands\n'+a+' - '+b+'\n\n';
+    steps+='Step 2: Take 1\'s complement of subtrahend\n'+b+' -> '+bOnes+'\n\n';
+    steps+='Step 3: Add minuend and 1\'s complement\n'+a+' + '+bOnes+' = '+sum+'\n\n';
+    if(sum.length>a.length){
+        const carry=sum[0];
+        const lower=sum.slice(1);
+        steps+='Step 4: End-around carry = '+carry+'\n';
+        const wrapped=addBinary(lower, carry.padStart(a.length,'0')).slice(-a.length);
+        steps+='Step 5: Add carry to lower bits\n'+lower+' + '+carry.padStart(a.length,'0')+' = '+wrapped+'\n\n';
+        sum=wrapped;
+    } else {
+        steps+='Step 4: No end-around carry\n\n';
+    }
+    displayBinaryResult('1\'s Complement Subtraction Result: <strong>'+sum+'</strong>', steps);
+}
+
+function twosSubtraction(){
+    const num1=document.getElementById('num1').value.trim();
+    const num2=document.getElementById('num2').value.trim();
+    if(!isBinary(num1) || !isBinary(num2) || num1==='' || num2===''){
+        displayBinaryResult('Please enter two valid binary numbers.', '');
+        return;
+    }
+    let [a,b]=padBinary(num1,num2);
+    const bTwos=twosComplement(b);
+    let sum=addBinary(a,bTwos);
+    let steps='Step 1: Align operands\n'+a+' - '+b+'\n\n';
+    steps+='Step 2: Take 2\'s complement of subtrahend\n'+b+' -> '+bTwos+'\n\n';
+    steps+='Step 3: Add minuend and 2\'s complement\n'+a+' + '+bTwos+' = '+sum+'\n\n';
+    if(sum.length>a.length){
+        steps+='Step 4: Overflow carry dropped\n';
+        sum=sum.slice(1);
+    } else {
+        steps+='Step 4: No overflow carry\n';
+    }
+    displayBinaryResult('2\'s Complement Subtraction Result: <strong>'+sum+'</strong>', steps);
+}
+</script>
+
+<h2>Binary Addition & Subtraction</h2>
+
+<input type="text" id="num1" placeholder="First Binary Number">
+<input type="text" id="num2" placeholder="Second Binary Number">
+
+<button onclick="onesAddition()">1's Complement Addition</button>
+
+<button onclick="twosAddition()">2's Complement Addition</button>
+
+<button onclick="onesSubtraction()">1's Complement Subtraction</button>
+
+<button onclick="twosSubtraction()">2's Complement Subtraction</button>
+
+<div id="answer"></div>
+
+<h3 style="margin-top:20px;">Step-by-Step Solution</h3>
+<pre id="binarySteps">Your step-by-step solution will appear here...</pre>
+
+</body>
+</html>
